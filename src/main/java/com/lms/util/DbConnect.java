@@ -10,11 +10,20 @@ public class DbConnect {
 	public static Connection getConnnection() throws SQLException, ClassNotFoundException {
 		
 		// 2. Define database fields
-		String DB_URI = "jdbc:mysql://localhost:3306/lms_system";
-		String DB_USER = "root";
-		String DB_PASSWORD = "Rakesh@95560";
+		final String DB_URI = System.getenv("DB_URI");
+		final String DB_USER = System.getenv("DB_USER");
+		final String DB_PASSWORD = System.getenv("DB_PASSWORD");
+		
+		
+		// Debugging: Envirnment varibles correctly loads or not
+		System.out.println("DB URI: " + DB_URI + " USER: " + DB_USER + " PASSWORD: " + DB_PASSWORD);
 		
 		Connection conn;
+		
+		if (DB_URI == null || DB_USER == null || DB_PASSWORD == null) {
+	        throw new SQLException("Database connection details are not properly set in environment variables.");
+	    }
+
 		
 		try {
 			// 3. Load the MySQL JDBC driver

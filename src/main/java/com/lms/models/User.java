@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public abstract class User {
 	private Role role;
 	private String fullname;
@@ -87,7 +89,7 @@ public abstract class User {
 		if(password == null || password.trim().isEmpty() || password.trim().length() < 8) {
 			throw new IllegalArgumentException("Password must be atleast 8 characters");
 		}
-		this.password = password;
+		this.password = hashPassword(password);
 	}
 	
 	
@@ -166,6 +168,16 @@ public abstract class User {
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}	
+	
+	
+	// Password util methods
+	public String hashPassword(String password) {
+		return BCrypt.hashpw(password, BCrypt.gensalt(10));
+	}
+	
+	public boolean verifyPassword(String password, String hashedPassword) {
+		return BCrypt.checkpw(password.trim(), hashedPassword);
+	}
 	
 }
 

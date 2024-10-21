@@ -17,9 +17,8 @@ import com.lms.models.Specialization;
 import com.lms.models.StudentType;
 import com.lms.models.UniversityStudent;
 import com.lms.util.ApiError;
-import com.lms.util.DuplicateEntryException;
 
-@WebServlet("/studentRegister")
+@WebServlet("/student/register")
 public class StudentRegistrationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -156,12 +155,6 @@ public class StudentRegistrationServlet extends HttpServlet {
 //					    System.out.println(universityStudent.getSpecialization());
 //					    System.out.println(universityStudent.getUniversityEmail());
 					    
-					    // Check if user already exist with email or studentId
-					    boolean isExist = universityStudentDao.findUser(universityStudent.getEmail(), universityStudent.getStudentId());
-					    
-					    if(isExist) {
-					    	throw new DuplicateEntryException("User already exist with this email or username!", null);
-					    }
 					    
 					    // Calling the DAO class method to register the university student
 					    boolean isRegistered = universityStudentDao.registerStudent(universityStudent);
@@ -253,16 +246,11 @@ public class StudentRegistrationServlet extends HttpServlet {
 //					    System.out.println(individualStudent.getSpecialization());
 					    
 						
-						// Step 5: Check if user already exist with username or email
-					    boolean isExist = individualStudentDao.findUser(individualStudent.getUsername(), individualStudent.getEmail());
-					    if(isExist) {
-					    	throw new DuplicateEntryException("User already exist with this email or student id!", null);
-					    }
 						
-						// Step 6: Register the individual student
+						// Step 5: Register the individual student
 						boolean isRegistered = individualStudentDao.registerStudent(individualStudent);
 						
-						// Step 7: Check if student is successfully registered or not
+						// Step 6: Check if student is successfully registered or not
 						 if (isRegistered) {
 							 res.getWriter().write("Individual student registered successfully!");
 						 } 

@@ -1,8 +1,5 @@
 package com.lms.util;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class ApiError extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	

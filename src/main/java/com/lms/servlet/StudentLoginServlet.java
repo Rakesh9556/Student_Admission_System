@@ -13,7 +13,7 @@ import com.lms.models.IndividualStudent;
 import com.lms.models.UniversityStudent;
 import com.lms.util.ApiError;
 
-@WebServlet("/studentLogin")
+@WebServlet("/student/login")
 public class StudentLoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
@@ -62,7 +62,7 @@ public class StudentLoginServlet extends HttpServlet {
 				UniversityStudent universityStudent = universityStudentDao.loginUser(credential, password);
 				
 				// Step 7: Check if user is successfully logged in or not
-				if(universityStudent != null) {
+				if(universityStudent.isLoggedIn()) {
                     res.getWriter().write("University student logged in successfully!");
 				}
 				else {
@@ -75,8 +75,8 @@ public class StudentLoginServlet extends HttpServlet {
 				IndividualStudent individualStudent = individualStudentDao.loginUser(credential, password);
 				
 				// Step 7: Check if user is successfully logged in or not
-				if(individualStudent != null) {
-                    res.getWriter().write("University student logged in successfully!");
+				if(individualStudent.isLoggedIn()) {
+                    res.getWriter().write("Individual student logged in successfully!");
 				}
 				else {
                     throw new ApiError(401, "Invalid university email or student ID, or password!");
