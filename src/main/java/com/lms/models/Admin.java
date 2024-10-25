@@ -2,6 +2,10 @@ package com.lms.models;
 
 import java.util.List;
 
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
+
 
 
 public class Admin extends User {

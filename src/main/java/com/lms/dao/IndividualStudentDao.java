@@ -7,11 +7,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import com.lms.models.Department;
 import com.lms.models.IndividualStudent;
-import com.lms.models.Role;
-import com.lms.models.Specialization;
-import com.lms.models.StudentType;
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
+import com.lms.models.constants.StudentType;
 import com.lms.util.DbConnect;
 import com.lms.util.DuplicateEntryException;
 
@@ -99,6 +99,50 @@ public class IndividualStudentDao {
 	}
 	
 	
+	// Retrieve student info
+	public IndividualStudent getByUsernameOrEmail(String usernameOrEmail) throws Exception {
+		
+		// Step 1: Prepare the query
+		final String getUser = "SELECT * FROM individual_students WHERE username = ? OR email = ?";
+		
+		// Step 2: Establish the connection
+		try(Connection conn = DbConnect.getConnnection();
+				PreparedStatement st = conn.prepareStatement(getUser)) {
+			
+			// Step 3: Setting up the placeholders with actual values
+			st.setString(1, usernameOrEmail);
+			st.setString(2, usernameOrEmail);
+			
+			// Step 4: Execute the query and store the results into result set
+			ResultSet rs = st.executeQuery();
+			
+			// Step 5: If resultset exist retrieve the student details
+			if(rs.next()) {
+				
+				IndividualStudent individualStudent = new IndividualStudent();
+				individualStudent.setRole(Role.valueOf(rs.getString("role")));
+				individualStudent.setStudentType(StudentType.valueOf(rs.getString("studentType")));	
+				individualStudent.setUsername("username");
+				individualStudent.setFullname(rs.getString("fullname"));
+				individualStudent.setEmail(rs.getString("email"));
+				individualStudent.setUniversityName(rs.getString("universityName"));
+				individualStudent.setDepartment(Department.valueOf(rs.getString("department")));
+				individualStudent.setSpecialization(Specialization.valueOf(rs.getString("specialization")));
+				individualStudent.setRefreshToken(rs.getString("refreshToken"));
+				
+				// Step 6: Return the student object
+				return individualStudent;
+			}
+			else {
+                throw new Exception("Student doesn't exist with this email or id!");
+			}
+			
+		} catch (SQLException e) {
+			throw new SQLException("Failed to connect to the database!", e);
+		}
+	}
+	
+	
 	// Login the user
 	public IndividualStudent loginUser(String emailOrUsername, String password) throws Exception {
 		
@@ -182,6 +226,39 @@ public class IndividualStudentDao {
 			throw new SQLException("Failed to connect to the database!", e);
 		}
 	}
+	
+	
+	// Update the refreshToken field in database
+	public void updateRefreshToken(IndividualStudent individualStudent) throws SQLException, ClassNotFoundException {
 		
+		// Step 1: Prepare the sql query
+		final String updateRefreshToken = "UPDATE individual_students SET refreshToken = ?, updated_at = ? WHERE email = ? OR username = ?";
+		
+		
+		// Step 2: Establish the connection
+		try(Connection conn = DbConnect.getConnnection();
+				PreparedStatement st = conn.prepareStatement(updateRefreshToken)) {
+			
+			// Step 3: Setting up placeholders with actual values
+			st.setString(1, individualStudent.getRefreshToken());
+			st.setTimestamp(2, Timestamp.valueOf(individualStudent.getUpdatedAt()));
+			st.setString(3, individualStudent.getEmail());
+			st.setString(4, individualStudent.getUsername());
+			
+			// Step 4: Execute the prepared statement
+			int rowsAffected = st.executeUpdate();
+			
+			// Step 5: Validate if database operation performed or not
+			if (rowsAffected > 0) {
+                System.out.println("Refresh token updated successfully.");
+            } else {
+                System.out.println("No user found with the given username or email.");
+            }
+				
+		} catch (SQLException e) {
+			throw new SQLException("Failed to update refresh token!");
 
+		}
+	}
+		
 }

@@ -1,4 +1,4 @@
-package com.lms.servlet;
+package com.lms.servlet.auth;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 import com.lms.dao.IndividualStudentDao;
 import com.lms.dao.UniversityStudentDao;
@@ -13,6 +14,8 @@ import com.lms.models.IndividualStudent;
 import com.lms.models.UniversityStudent;
 import com.lms.util.ApiError;
 import com.lms.util.JwtUtil;
+
+// Purpose: Handle user authentication and generates accessToken and refreshToken upon successful login
 
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
@@ -79,6 +82,34 @@ public class AuthServlet extends HttpServlet {
 					
 					if(isUserLoggedIn) {
 	                    res.getWriter().write("University student logged in successfully!");
+	                    
+	                    //  Step 9: If user logged in successfully then generate the access token
+	                    String accessToken = jwt.generateStudentAccessToken(
+	                    		universityStudent.getStudentId(),
+	                    		universityStudent.getRole().toString(),
+	                    		universityStudent.getStudentType().toString(),
+	                    		Map.of("university name" , universityStudent.getUniversityName(),
+	                    				"university email", universityStudent.getEmail(),
+	                    			    "department", universityStudent.getDepartment().toString(),
+	                    			    "specialization", universityStudent.getSpecialization().toString())
+	                    );
+	                    
+	                    // Step 10: Generate the refresh token
+	                    String refreshToken = jwt.generateRefreshToken(universityStudent.getStudentId());
+	                    
+	                    // Step 11: Set the refresh token in the UniversityStudent object
+	                    universityStudent.setRefreshToken(refreshToken);
+	                    
+	                    // Step 12: Update the student in the database here
+	                    universityStudentDao.updateRefreshToken(universityStudent);
+	                    
+	                    // Debugging
+	                    // System.out.println("Access token: " + accessToken);
+	                    // System.out.println("Refresh token: " + refreshToken);
+	                    
+	                    // Send tokens back to client
+	                    res.getWriter().write("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
+	                
 					}
 					else {
 	                    throw new ApiError(401, "Invalid university email or student ID, or password!");
@@ -94,7 +125,32 @@ public class AuthServlet extends HttpServlet {
 					boolean isUserLoggedIn = individualStudent.isLoggedIn();
 					
 					if(isUserLoggedIn) {
-	                    res.getWriter().write("University student logged in successfully!");
+	                    res.getWriter().write("Individual student logged in successfully!");
+	                    
+	                    // If user logged in successfully then generate the access token
+	                    String accessToken = jwt.generateStudentAccessToken(
+	                    		individualStudent.getEmail(),
+	                    		individualStudent.getRole().toString(),
+	                    		individualStudent.getStudentType().toString(),
+	                    		Map.of("username", individualStudent.getUsername(),
+	                    				"universityName", individualStudent.getUniversityName(),
+	                    				"department", individualStudent.getDepartment().toString(),
+	                    				"specialization", individualStudent.getSpecialization().toString())		
+	                    );
+	                    
+	                    // Generate refresh token
+	                    String refreshToken = jwt.generateRefreshToken(individualStudent.getEmail());
+	                    
+	                    // Set the refresh token in the UniversityStudent object
+	                    individualStudent.setRefreshToken(refreshToken);
+	                    
+	                    // Optionally, update the student in the database here
+	                    individualStudentDao.updateRefreshToken(individualStudent);
+	                    
+	                    // Send tokens back to client
+	                    res.getWriter().write("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
+	                
+
 					}
 					else {
 	                    throw new ApiError(401, "Invalid university email or student ID, or password!");

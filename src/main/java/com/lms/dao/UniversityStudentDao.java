@@ -6,11 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import com.lms.models.Department;
-import com.lms.models.Role;
-import com.lms.models.Specialization;
-import com.lms.models.StudentType;
+
 import com.lms.models.UniversityStudent;
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
+import com.lms.models.constants.StudentType;
 import com.lms.util.DbConnect;
 import com.lms.util.DuplicateEntryException;
 
@@ -79,7 +80,7 @@ public class UniversityStudentDao {
 	public boolean findUser (String studentIdOrUniversityEmail) throws SQLException, ClassNotFoundException {
 		
 		// Step 1: Prepare the query
-		final String findUser = "SELECT COUNT(*) FROM university_students WHERE universityEmail = ? OR studentId = ?";
+		final String findUser = "SELECT COUNT(*) FROM university_students WHERE studentId = ? OR universityEmail = ?";
 		
 		// Step 2: Establish the connection
 		try(Connection conn = DbConnect.getConnnection();
@@ -101,6 +102,51 @@ public class UniversityStudentDao {
 		}
 		
 		return false;
+	}
+	
+	
+	// Retrieve student info
+	public UniversityStudent getByUsernameOrEmail(String studentIdOrUniversityEmail) throws Exception {
+		
+		// Step 1: Prepare the query
+		final String getUser = "SELECT * FROM university_students WHERE studentId = ? OR universityEmail = ?";
+		
+		// Step 2: Establish the connection
+		try(Connection conn = DbConnect.getConnnection();
+				PreparedStatement st = conn.prepareStatement(getUser)) {
+			
+			// Step 3: Setting up the placeholders with actual values
+			st.setString(1, studentIdOrUniversityEmail);
+			st.setString(2, studentIdOrUniversityEmail);
+			
+			// Step 4: Execute the query and store the results into result set
+			ResultSet rs = st.executeQuery();
+			
+			// Step 5: If resultset exist retrieve the student details
+			if(rs.next()) {
+				
+				UniversityStudent universityStudent = new UniversityStudent();
+				universityStudent.setRole(Role.valueOf(rs.getString("role")));
+				universityStudent.setStudentType(StudentType.valueOf(rs.getString("studentType")));	
+				universityStudent.setFullname(rs.getString("fullname"));
+				universityStudent.setEmail(rs.getString("email"));
+				universityStudent.setStudentId(rs.getString("studentId"));
+				universityStudent.setUniversityName(rs.getString("universityName"));
+				universityStudent.setDepartment(Department.valueOf(rs.getString("department")));
+				universityStudent.setSpecialization(Specialization.valueOf(rs.getString("specialization")));
+				universityStudent.setUniversityEmail(rs.getString("universityEmail"));
+				universityStudent.setRefreshToken(rs.getString("refreshToken"));
+				
+				// Step 6: Return the student object
+				return universityStudent;
+			}
+			else {
+                throw new Exception("User doesn't exist with this email or id!");
+			}
+			
+		} catch (SQLException e) {
+			throw new SQLException("Failed to connect to the database!", e);
+		}
 	}
 	
 	
@@ -188,6 +234,40 @@ public class UniversityStudentDao {
 		} catch (SQLException e) {
 			throw new SQLException("Failed to connect to the database!", e);
 		}
+	}
+	
+	
+	// Update the refreshToken field in database
+	public void updateRefreshToken(UniversityStudent universityStudent) throws SQLException, ClassNotFoundException {
+		
+		// Step 1: Prepare the sql query
+		final String updateRefreshToken = "UPDATE university_students SET refreshToken = ?, updated_at = ? WHERE universityEmail = ? OR studentId = ?";
+		
+		
+		// Step 2: Establish the connection
+		try(Connection conn = DbConnect.getConnnection();
+				PreparedStatement st = conn.prepareStatement(updateRefreshToken)) {
+			
+			// Step 3: Setting up placeholders with actual values
+			st.setString(1, universityStudent.getRefreshToken());
+			st.setTimestamp(2, Timestamp.valueOf(universityStudent.getUpdatedAt()));
+			st.setString(3, universityStudent.getUniversityEmail());
+			st.setString(4, universityStudent.getStudentId());
+			
+			// Step 4: Execute the prepared statement
+			int rowsAffected = st.executeUpdate();
+			
+			// Step 5: Validate if database operation performed or not
+			if (rowsAffected > 0) {
+                System.out.println("Refresh token updated successfully.");
+            } else {
+                System.out.println("No user found with the studenty id or university email.");
+            }
+				
+		} catch (SQLException e) {
+			throw new SQLException("Failed to update refresh token!");
+
+		}	
 	}
 }
 

@@ -1,4 +1,4 @@
-package com.lms.servlet;
+package com.lms.servlet.registration;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 
 import com.lms.dao.IndividualStudentDao;
 import com.lms.dao.UniversityStudentDao;
-import com.lms.models.Department;
 import com.lms.models.IndividualStudent;
-import com.lms.models.Role;
-import com.lms.models.Specialization;
-import com.lms.models.StudentType;
 import com.lms.models.UniversityStudent;
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
+import com.lms.models.constants.StudentType;
 import com.lms.util.ApiError;
 
 @WebServlet("/student/register")

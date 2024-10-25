@@ -1,9 +1,9 @@
 package com.lms.dao;
 
 import com.lms.models.Faculty;
-import com.lms.models.Department;
-import com.lms.models.Role;
-import com.lms.models.Specialization;
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
 import com.lms.util.DbConnect;
 import com.lms.util.DuplicateEntryException;
 

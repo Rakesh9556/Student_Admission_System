@@ -1,10 +1,10 @@
-package com.lms.servlet;
+package com.lms.servlet.registration;
 
 import com.lms.dao.AdminDao;
 import com.lms.models.Admin;
-import com.lms.models.Department;
-import com.lms.models.Role;
-import com.lms.models.Specialization;
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
 import com.lms.util.ApiError;
 import com.lms.util.DuplicateEntryException;
 

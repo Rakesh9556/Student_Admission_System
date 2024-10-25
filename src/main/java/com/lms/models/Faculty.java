@@ -3,6 +3,10 @@ package com.lms.models;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
+
 public class Faculty extends User {
 	 private String facultyId;
 	 private LocalDate joiningDate;

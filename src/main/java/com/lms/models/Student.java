@@ -1,5 +1,9 @@
 package com.lms.models;
 
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
+import com.lms.models.constants.StudentType;
 
 public abstract class Student extends User{
 	private StudentType studentType;

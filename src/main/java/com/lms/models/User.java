@@ -6,6 +6,10 @@ import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.lms.models.constants.Department;
+import com.lms.models.constants.Role;
+import com.lms.models.constants.Specialization;
+
 public abstract class User {
 	private Role role;
 	private String fullname;
@@ -19,6 +23,10 @@ public abstract class User {
 	private boolean isLoggedIn;
 	private LocalDate createdAt;
 	private LocalDateTime updatedAt;
+	
+	
+	// for handelling refresh token
+	private String refreshToken;
 	
 	
 	
@@ -167,7 +175,20 @@ public abstract class User {
 	}
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
-	}	
+	}
+	
+	
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+	public void setRefreshToken(String refreshToken) {
+		if(refreshToken == null || refreshToken.trim().isEmpty()) {
+			throw new IllegalArgumentException("Refresh token cannot be empty");
+		}
+		this.refreshToken = refreshToken;
+	}
+	
+	
 	
 	
 	// Password util methods
