@@ -13,7 +13,7 @@ public class WelcomeServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         // Forward the request to registration.jsp
-        req.getRequestDispatcher("registration.jsp").forward(req, res);
+        req.getRequestDispatcher("index.jsp").forward(req, res);
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
