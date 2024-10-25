@@ -1,0 +1,374 @@
+{
+	"info": {
+		"_postman_id": "0e41b8f5-5ce4-4cc3-8932-42fcb143e28d",
+		"name": "LMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33953217"
+	},
+	"item": [
+		{
+			"name": "Registration",
+			"item": [
+				{
+					"name": "Register University Student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "role",
+									"value": "STUDENT",
+									"type": "text"
+								},
+								{
+									"key": "studentType",
+									"value": "UNIVERSITY",
+									"type": "text"
+								},
+								{
+									"key": "firstname",
+									"value": "Rakesh",
+									"type": "text"
+								},
+								{
+									"key": "lastname",
+									"value": "Guru",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "rakeshguru95560@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Rakesh12345",
+									"type": "text"
+								},
+								{
+									"key": "universityName",
+									"value": "XYZ University",
+									"type": "text"
+								},
+								{
+									"key": "studentId",
+									"value": "220301120151",
+									"type": "text"
+								},
+								{
+									"key": "universityEmail",
+									"value": "220301120151@cutm.ac.in",
+									"type": "text"
+								},
+								{
+									"key": "department",
+									"value": "COMPUTER_SCIENCE",
+									"type": "text"
+								},
+								{
+									"key": "specialization",
+									"value": "SOFTWARE_ENGINEERING",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/student/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"student",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Individual Student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "role",
+									"value": "STUDENT",
+									"type": "text"
+								},
+								{
+									"key": "studentType",
+									"value": "INDIVIDUAL",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "rakesh9556",
+									"type": "text"
+								},
+								{
+									"key": "firstname",
+									"value": "Rakesh",
+									"type": "text"
+								},
+								{
+									"key": "lastname",
+									"value": "Guru",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "rakeshguru432@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Rakesh@955",
+									"type": "text"
+								},
+								{
+									"key": "universityName",
+									"value": "XYZ University",
+									"type": "text"
+								},
+								{
+									"key": "department",
+									"value": "COMPUTER_SCIENCE",
+									"type": "text"
+								},
+								{
+									"key": "specialization",
+									"value": "SOFTWARE_ENGINEERING",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/student/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"student",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login University Student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/auth?role=STUDENT&studentType=UNIVERSITY&credential=220301120151@cutm.ac.in&password=Rakesh12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"auth"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "STUDENT"
+								},
+								{
+									"key": "studentType",
+									"value": "UNIVERSITY"
+								},
+								{
+									"key": "credential",
+									"value": "220301120151@cutm.ac.in"
+								},
+								{
+									"key": "password",
+									"value": "Rakesh12345"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Individual Student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "role",
+									"value": "STUDENT",
+									"type": "text"
+								},
+								{
+									"key": "studentType",
+									"value": "INDIVIDUAL",
+									"type": "text"
+								},
+								{
+									"key": "credential",
+									"value": "rakesh9556",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Rakesh@955",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/auth",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UniveristyStudent verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMjAzMDExMjAxNTEiLCJyb2xlIjoiU1RVREVOVCIsInN0dWRlbnRUeXBlIjoiVU5JVkVSU0lUWSIsImRlcGFydG1lbnQiOiJDT01QVVRFUl9TQ0lFTkNFIiwidW5pdmVyc2l0eSBlbWFpbCI6InJha2VzaGd1cnU5NTU2MEBnbWFpbC5jb20iLCJ1bml2ZXJzaXR5IG5hbWUiOiJYWVogVW5pdmVyc2l0eSIsInNwZWNpYWxpemF0aW9uIjoiU09GVFdBUkVfRU5HSU5FRVJJTkciLCJpYXQiOjE3Mjk4NDkzNDEsImV4cCI6MTcyOTg1Mjk0MX0.BPJoHmZVMeLbjGJME9nKt_UfoEeD1-9VyYyIcBO3n0o",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/auth/verify",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"auth",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "University Student refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "RefreshToken",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMjAzMDExMjAxNTEiLCJpYXQiOjE3Mjk4NDkzNDEsImV4cCI6MTczMjQ0MTM0MX0.aWR42E5BVDba19fCb4j6B5ghY0_Es4oFmKuemzOqvHI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Individual Student verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYWtlc2hndXJ1NDMyQGdtYWlsLmNvbSIsInJvbGUiOiJTVFVERU5UIiwic3R1ZGVudFR5cGUiOiJJTkRJVklEVUFMIiwic3BlY2lhbGl6YXRpb24iOiJTT0ZUV0FSRV9FTkdJTkVFUklORyIsImRlcGFydG1lbnQiOiJDT01QVVRFUl9TQ0lFTkNFIiwidW5pdmVyc2l0eU5hbWUiOiJYWVogVW5pdmVyc2l0eSIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJpYXQiOjE3Mjk4NDk0MDAsImV4cCI6MTcyOTg1MzAwMH0.3VelzAFsB40mzI9XTKgc4jaOl23IFF9A-IUQbjy9OgA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/auth/verify?Authorization=Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsInJvbGUiOiJTVFVERU5UIiwic3R1ZGVudFR5cGUiOiJJTkRJVklEVUFMIiwidW5pdmVyc2l0eU5hbWUiOiJYWVogVW5pdmVyc2l0eSIsImVtYWlsIjoicmFrZXNoZ3VydTQzMkBnbWFpbC5jb20iLCJzcGVjaWFsaXphdGlvbiI6IlNPRlRXQVJFX0VOR0lORUVSSU5HIiwiZGVwYXJ0bWVudCI6IkNPTVBVVEVSX1NDSUVOQ0UiLCJpYXQiOjE3Mjk4NDM3OTQsImV4cCI6MTcyOTg0NzM5NH0.LiQ3eQVwy_6TO6ZeP5vhLwswfZ0W06EtsCAqHNuLR10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"auth",
+								"verify"
+							],
+							"query": [
+								{
+									"key": "Authorization",
+									"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsInJvbGUiOiJTVFVERU5UIiwic3R1ZGVudFR5cGUiOiJJTkRJVklEVUFMIiwidW5pdmVyc2l0eU5hbWUiOiJYWVogVW5pdmVyc2l0eSIsImVtYWlsIjoicmFrZXNoZ3VydTQzMkBnbWFpbC5jb20iLCJzcGVjaWFsaXphdGlvbiI6IlNPRlRXQVJFX0VOR0lORUVSSU5HIiwiZGVwYXJ0bWVudCI6IkNPTVBVVEVSX1NDSUVOQ0UiLCJpYXQiOjE3Mjk4NDM3OTQsImV4cCI6MTcyOTg0NzM5NH0.LiQ3eQVwy_6TO6ZeP5vhLwswfZ0W06EtsCAqHNuLR10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Individual Student Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "RefreshToken",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYWtlc2hndXJ1NDMyQGdtYWlsLmNvbSIsImlhdCI6MTcyOTg0OTQwMCwiZXhwIjoxNzMyNDQxNDAwfQ.l5IYc576dSxYKaQ7Cu2LwfSYaaH1Gtjk7g1JIVW7kPM",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/Learning_Management_System/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"Learning_Management_System",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
