@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -88,5 +89,37 @@ public class JwtUtil {
 				.signWith(secret, SignatureAlgorithm.HS256)
 				.compact();
 	}
+	
+	// Parse token for retriving user related info
+	public Claims parseToken(String token) {
+		try {
+			return Jwts.parserBuilder()
+					.setSigningKey(getSecret())
+					.build()
+					.parseClaimsJws(token.replace("Bearer ", ""))
+					.getBody();
+        } catch (Exception e) {
+            throw new ApiError(400, "Failed to parse token");
+        }
+	}
+	
+	// retrive user id from the token
+	public String getUserIdFromToken(String token) {
+		return parseToken(token).getSubject();
+	}
+	
+	// Retrive user role from token
+	public String getUserRoleFromToken(String token) {
+		return parseToken(token).get("role", String.class);
+	}
+	
+	// Validate the token expiry
+	public void validateTokenExpiry(String token) {
+		Date expiration = parseToken(token).getExpiration();
+		if(expiration != null && expiration.before(new Date())) {
+			throw new ApiError(401, "Token has expired!");
+		}
+	}
+	
 
 }

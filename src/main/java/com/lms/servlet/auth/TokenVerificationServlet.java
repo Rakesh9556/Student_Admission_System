@@ -10,8 +10,6 @@ import java.io.IOException;
 import com.lms.util.ApiError;
 import com.lms.util.JwtUtil;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 // Purpose: Verifies the validity of the access token which is sent with requests access protected endpoint
 
@@ -40,22 +38,19 @@ public class TokenVerificationServlet extends HttpServlet {
 		String token = req.getHeader("Authorization");
 		
 		// Step 2: Validate the token
-		if(token == null || token.trim().isEmpty()) {
-			throw new ApiError(400, "Token is missing");
-		}
+		if (token == null || !token.startsWith("Bearer ")) {
+	        throw new ApiError(400, "Token is missing or incorrectly formatted");
+	    }
+	    token = token.replace("Bearer ", "").trim();
 		
-		// Step 3: If access token exist verify it
+		// Step 3: If access token exist verify it 
+		// Verification done in jwt class
 		try {
 			
-			Claims claims = Jwts.parserBuilder()
-					.setSigningKey(jwt.getSecret())
-					.build()
-					.parseClaimsJws(token.replace("Bearer", ""))
-					.getBody();
-			
-			// Step 4: Extract the user id and role 
-			String userId = claims.getSubject();
-            String role = claims.get("role", String.class);
+			// Step 4: Vaklidate access token expiry then extract the user id and role 
+			jwt.validateTokenExpiry(token);
+			String userId = jwt.getUserIdFromToken(token);
+            String role = jwt.getUserRoleFromToken(token);
             
             // Step 5: Set the user ID and role as request attributes to forward to the next layer
             req.setAttribute("userId", userId);

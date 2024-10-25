@@ -257,7 +257,37 @@ public class IndividualStudentDao {
 				
 		} catch (SQLException e) {
 			throw new SQLException("Failed to update refresh token!");
-
+		}
+	}
+	
+	
+	// logout the student
+	public void logout(String emailOrUsername) throws SQLException, ClassNotFoundException {
+		
+		// Step 1: Preapare the query
+		String invalidateStudent = "UPDATE individual_students SET refreshToken = NULL, isLoggedIn = FALSE WHERE email = ? OR username = ?";
+		
+		// Step 2: Establish the connection
+		try(Connection conn = DbConnect.getConnnection();
+				PreparedStatement st = conn.prepareStatement(invalidateStudent)) {
+			
+			// Step 3: Setting up the placeholders with actual values
+			st.setString(1, emailOrUsername);
+			st.setString(2, emailOrUsername);
+			
+			// Step 4: Execute the prepared statement
+			int rowsAffected = st.executeUpdate();
+			// Step 5: Validate if database operation performed or not
+			if (rowsAffected > 0) {
+                System.out.println("Student logout successfully.");
+            } else {
+                System.out.println("User not found with this studenty id or university email.");
+            }
+				
+		} catch (SQLException e) {
+			System.err.println("SQL State: " + e.getSQLState());
+	        System.err.println("Error Code: " + e.getErrorCode());
+			throw new SQLException("Failed to logout student!", e);
 		}
 	}
 		

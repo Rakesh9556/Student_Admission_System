@@ -1,12 +1,12 @@
 package com.lms.servlet.auth;
 
 import jakarta.servlet.ServletException;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
 
 import com.lms.dao.IndividualStudentDao;
@@ -16,8 +16,7 @@ import com.lms.models.UniversityStudent;
 import com.lms.util.ApiError;
 import com.lms.util.JwtUtil;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+
 
 // Purpose: Verifies the refresh token and if valid issue a new access token
 
@@ -52,25 +51,13 @@ public class RefreshTokenServlet extends HttpServlet {
 	    }
 	    refreshToken = refreshToken.replace("Bearer ", "").trim();
 		
-		
 		// Step 3: If refresh token exist, verify it
+	    // Verification done in jwt
 		try {
 			
-			Claims claims = Jwts.parserBuilder()
-					.setSigningKey(jwt.getSecret())
-					.build()
-					.parseClaimsJws(refreshToken)
-					.getBody();
-			
-			System.out.println("Claims: " + claims);
-
-			
-			// Step 4: Extract the user id
-			String userId = claims.getSubject();
-			Date expiration = claims.getExpiration();
-	        if (expiration != null && expiration.before(new Date())) {
-	            throw new ApiError(401, "Refresh token has expired!");
-	        }
+			// Step 4: Validate token expiry and extract the user id
+			jwt.validateTokenExpiry(refreshToken);
+			String userId = jwt.getUserIdFromToken(refreshToken);
 			
 			// Step 4: Verifies if the user exist or not in the database
 			boolean isIndividualStudentExist = individualStudentDao.findUser(userId);
