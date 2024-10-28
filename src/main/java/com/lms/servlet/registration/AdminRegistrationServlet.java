@@ -6,7 +6,6 @@ import com.lms.models.constants.Department;
 import com.lms.models.constants.Role;
 import com.lms.models.constants.Specialization;
 import com.lms.util.ApiError;
-import com.lms.util.DuplicateEntryException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,10 +14,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
-@WebServlet("/adminRegister")
+
+@WebServlet("/admin/register")
 public class AdminRegistrationServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -52,21 +50,20 @@ public class AdminRegistrationServlet extends HttpServlet {
             if (role.equals("ADMIN")) {
                 // Step 2: Define the fields for the admin
             	String adminId = req.getParameter("adminId");
-            	String adminLabel = req.getParameter("adminLabel");
+            	String adminLevel = req.getParameter("adminLabel");
                 String fullname = req.getParameter("fullname");
                 String email = req.getParameter("email");
                 String password = req.getParameter("password");
                 String universityName = req.getParameter("universityName");
                 String department = req.getParameter("department");
                 String specialization = req.getParameter("specialization");
-//                String permissions = req.getParameter("permissions");
 
                 // Step 3: Validate all the fields
                 if (adminId == null || adminId.trim().isEmpty()) {
                     throw new ApiError(400, "Admin ID is required!");
                 }
 
-                if (adminLabel == null || adminLabel.trim().isEmpty()) {
+                if (adminLevel == null || adminLevel.trim().isEmpty()) {
                     throw new ApiError(400, "Admin Label is required!");
                 }
                 if (fullname == null || fullname.trim().isEmpty()) {
@@ -93,9 +90,7 @@ public class AdminRegistrationServlet extends HttpServlet {
                     throw new ApiError(400, "Specialization is required!");
                 }
 
-//                if (permissions == null || permissions.trim().isEmpty()) {
-//                    throw new ApiError(400, "Permissions are required!");
-//                }
+
 
                 // Step 4: Validate enum fields and parse permissions
                 try {
@@ -103,39 +98,32 @@ public class AdminRegistrationServlet extends HttpServlet {
                     Department departmentEnum = Department.valueOf(department.toUpperCase());
                     Specialization specializationEnum = Specialization.valueOf(specialization.toUpperCase());
 
-                    // Parse permissions from comma-separated string
-//                    List<String> permissionsList = Arrays.asList(permissions.split(","));
+
 
                     // Step 5: Create the Admin object
                     Admin admin = new Admin();
                     admin.setRole(roleEnum);
                     admin.setAdminId(adminId);
-                    admin.setAdminLabel(adminLabel);
+                    admin.setAdminLevel(adminLevel);
                     admin.setFullname(fullname);
                     admin.setEmail(email);
                     admin.setPassword(password);
                     admin.setUniversityName(universityName);
                     admin.setDepartment(departmentEnum);
                     admin.setSpecialization(specializationEnum);
-//                    admin.setPermissions(permissions);
 
-                    // Step 6: Check if admin already exists with email or admin ID
-                    boolean isExist = adminDao.findAdmin(admin.getAdminId(), admin.getEmail());
-                    if (isExist) {
-                        throw new DuplicateEntryException("User already exists with this email or admin ID!", null);
-                    }
 
                     // Step 7: Register the admin
                     boolean isRegistered = adminDao.registerAdmin(admin);
 
                     // Step 8: Check if admin is successfully registered
                     if (isRegistered) {
-                        res.getWriter().write("Admin registered successfully!");
+                        res.getWriter().write("Admin registered Successfully!");
                     } else {
                         throw new ApiError(500, "Failed to register admin!");
                     }
                 } catch (IllegalArgumentException e) {
-                    throw new ApiError(400, "Invalid department or specialization!");
+                    throw new ApiError(400, "Invalid department or specialization!" +e.getMessage());
                 }
             } else {
                 throw new ApiError(400, "Invalid role selected!");

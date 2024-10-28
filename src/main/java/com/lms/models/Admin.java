@@ -10,7 +10,8 @@ import com.lms.models.constants.Specialization;
 
 public class Admin extends User {
     private String adminId;
-    private String adminLabel;
+    private String adminLevel;
+    private String refreshToken;
     private List<String> permissions;
     
     public Admin() {
@@ -18,11 +19,11 @@ public class Admin extends User {
     }
 
     // Constructor
-    public Admin(Role role, String adminId, String adminLabel, String fullname, String email, String password, String universityName, Department department,
-                 Specialization specialization, List<String> permissions) {
+    public Admin(Role role, String adminId, String adminLevel, String fullname, String email, String password, String universityName, Department department,
+                 Specialization specialization) {
         super(role, fullname, email, password, universityName, department, specialization);
         this.setAdminId(adminId);
-        this.setAdminLabel(adminLabel);
+        this.setAdminLevel(adminLevel);
         this.setPermissions(permissions);
     }
 
@@ -38,15 +39,24 @@ public class Admin extends User {
         this.adminId = adminId;
     }
 
-    public String getAdminLabel() {
-        return adminLabel;
+    public String getAdminLevel() {
+        return adminLevel;
     }
 
-    public void setAdminLabel(String adminLabel) {
-        if (adminLabel == null || adminLabel.trim().isEmpty()) {
+    public void setAdminLevel(String adminLevel) {
+        if (adminLevel == null || adminLevel.trim().isEmpty()) {
             throw new IllegalArgumentException("Admin Label cannot be empty");
         }
-        this.adminLabel = adminLabel;
+        this.adminLevel = adminLevel;
+    }
+    
+    // Added Getter and Setter for refreshToken
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public List<String> getPermissions() {

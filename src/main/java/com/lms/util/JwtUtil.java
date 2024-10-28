@@ -59,22 +59,22 @@ public class JwtUtil {
 		}
 
 	
-	// Create admin jwt token
-	public String generateAdminAccessToken(String id, String role, String adminId, String adminLevel, String[] permissions) {
-		Date currentTime = new Date(System.currentTimeMillis());
-		Date expTime = new Date(System.currentTimeMillis() + 3600000);
-		
-		return Jwts.builder()
-				.setSubject(id)
-				.claim("role", role)
-				.claim("adminId", adminId)
-				.claim("adminLevel", adminLevel)
-				.claim("permissions", permissions)
-				.setIssuedAt(currentTime)
-				.setExpiration(expTime)
-				.signWith(secret, SignatureAlgorithm.HS256)
-				.compact();
-	}
+		// Create admin jwt token
+		public String generateAdminAccessToken(String email, String role, String adminId, String adminLevel) {
+			Date currentTime = new Date(System.currentTimeMillis());
+			Date expTime = new Date(System.currentTimeMillis() + 3600000);
+			
+			return Jwts.builder()
+					.setSubject(email)
+					.claim("role", role)
+					.claim("adminId", adminId)
+					.claim("adminLevel", adminLevel)
+//					.claim("permissions", permissions)
+					.setIssuedAt(currentTime)
+					.setExpiration(expTime)
+					.signWith(secret, SignatureAlgorithm.HS256)
+					.compact();
+		}
 	
 	
 	// generate refresh token

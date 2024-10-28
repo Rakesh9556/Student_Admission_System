@@ -9,8 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+import com.lms.dao.AdminDao;
+import com.lms.dao.FacultyDao;
 import com.lms.dao.IndividualStudentDao;
 import com.lms.dao.UniversityStudentDao;
+import com.lms.models.Admin;
+import com.lms.models.Faculty;
 import com.lms.models.IndividualStudent;
 import com.lms.models.UniversityStudent;
 import com.lms.util.ApiError;
@@ -29,6 +33,8 @@ public class RefreshTokenServlet extends HttpServlet {
 	
 	IndividualStudentDao individualStudentDao = new IndividualStudentDao();
 	UniversityStudentDao universityStudentDao = new UniversityStudentDao();
+	FacultyDao facultyDao = new FacultyDao();
+	AdminDao adminDao = new AdminDao();
 	
 		
     public RefreshTokenServlet() {
@@ -62,6 +68,8 @@ public class RefreshTokenServlet extends HttpServlet {
 			// Step 4: Verifies if the user exist or not in the database
 			boolean isIndividualStudentExist = individualStudentDao.findUser(userId);
 			boolean isUniversityStudentExist = universityStudentDao.findUser(userId);
+			boolean isFacultyExist = facultyDao.findByEmailOrId(userId);
+			boolean isAdminExist = adminDao.findByEmailOrId(userId);
 			
 			String newAccessToken;
 			
@@ -144,6 +152,29 @@ public class RefreshTokenServlet extends HttpServlet {
 					// Step 9: Return the new access token in response
 		            res.getWriter().write("New Access Token: " + newAccessToken);
 	            }
+			
+			 else if(isAdminExist) { 
+					// Retrieve Admin object by email or id
+				    Admin admin = adminDao.getByEmailOrId(userId); 
+				    System.out.println("Stored token: " + admin.getRefreshToken());
+
+				    if (!refreshToken.equals(admin.getRefreshToken())) {
+				        System.out.println("Invalid token check: Received token: " + refreshToken);
+				        throw new ApiError(401, "Invalid refresh token!");
+				    }
+
+				    // Generate new access token for Admin
+				    newAccessToken = jwt.generateAdminAccessToken(
+				    	admin.getEmail(),
+				    	admin.getRole().toString(),
+				        admin.getAdminId(),
+				        admin.getAdminLevel()
+				    );
+
+				    // Return the new access token in response
+				    res.getWriter().write("New Access Token: " + newAccessToken);
+				    
+				}
 
 			else {
 				throw new ApiError(404, "User not found");

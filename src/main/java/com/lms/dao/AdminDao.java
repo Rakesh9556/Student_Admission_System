@@ -11,7 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 
 public class AdminDao {
 
@@ -19,23 +21,37 @@ public class AdminDao {
         return password;
     }
 
+
+
     // Register an admin
     public boolean registerAdmin(Admin admin) throws SQLException, ClassNotFoundException, DuplicateEntryException {
-        final String INSERT_ADMIN = "INSERT INTO admins (role, adminId, adminLabel, fullname, email, password, universityName, department, specialization, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+    	// Step 1: Check if the user already exists
+	    String credential = (admin.getAdminId() != null && !admin.getAdminId().isEmpty())
+	        ? admin.getAdminId()
+	        : admin.getEmail();
+
+	    boolean adminExists = findByEmailOrId(credential);
+	    
+	    if (adminExists) {
+	        throw new DuplicateEntryException("Admin already exist with this id or email!", null);
+	    }
+	    
+    	final String INSERT_ADMIN = "INSERT INTO admin (role, adminId, adminLevel, fullname, email, password, universityName, department, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DbConnect.getConnnection();
              PreparedStatement st = conn.prepareStatement(INSERT_ADMIN)) {
 
             st.setString(1, admin.getRole().name());
             st.setString(2, admin.getAdminId());
-            st.setString(3, admin.getAdminLabel());
+            st.setString(3, admin.getAdminLevel());
             st.setString(4, admin.getFullname());
             st.setString(5, admin.getEmail());
             st.setString(6, hashPassword(admin.getPassword()));
             st.setString(7, admin.getUniversityName());
             st.setString(8, admin.getDepartment().name());
             st.setString(9, admin.getSpecialization().name());
-            st.setString(10, String.join(",", admin.getPermissions()));
+            
 
             int rowsAffected = st.executeUpdate();
             if (rowsAffected == 0) {
@@ -43,60 +59,182 @@ public class AdminDao {
             }
             return true;
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
                 throw new DuplicateEntryException("Admin ID or Email ID already exists!", e);
             }
-            throw new SQLException("Failed to register the admin.", e);
+            e.printStackTrace(); // Log detailed error information
+            throw new SQLException("Failed to register the admin. Error: " + e.getMessage(), e);
         }
+
     }
 
-    // Check if an admin already exists
-    public boolean findAdmin(String adminId, String email) throws SQLException, ClassNotFoundException {
-        final String FIND_ADMIN = "SELECT 1 FROM admins WHERE adminId = ? OR email = ? LIMIT 1";
+
+ 	
+    // Login Admin
+ 	public Admin loginAdmin(String emailOrId, String password) throws Exception {
+ 		
+ 		// Step 1: Check if user exist or not
+ 		boolean isUserExist = findByEmailOrId(emailOrId);
+ 		
+ 		if(!isUserExist) {
+ 			throw new Exception("Admin doesn't exist with this student id or email!");
+ 		}
+ 		
+ 		// Step 2: Prepare the query
+        final String FIND_ADMIN = "SELECT * FROM admin WHERE (adminId = ? OR email = ?)";
+ 		
+ 		// Step 3: Establish the connection
+ 		try(Connection conn = DbConnect.getConnnection();
+ 				PreparedStatement st = conn.prepareStatement(FIND_ADMIN)) {
+ 			
+ 			// Step 4: Setting up the placeholder with actual values
+ 			st.setString(1, emailOrId);
+ 			st.setString(2, emailOrId);
+ 			
+ 			// Step 5: Execute the query and store the result into result set
+ 			ResultSet rs = st.executeQuery();
+ 			
+ 			
+ 			// Step 6: If the user is found create the user model and validate the password
+ 			if(rs.next()) {
+ 				
+ 				 Admin admin = new Admin();
+                 admin.setRole(Role.valueOf(rs.getString("role")));
+                 admin.setFullname(rs.getString("fullname"));
+                 admin.setEmail(rs.getString("email"));
+                 admin.setAdminId(rs.getString("adminId"));
+                 admin.setAdminLevel(rs.getString("adminLevel"));
+                 admin.setUniversityName(rs.getString("universityName"));
+                 admin.setDepartment(Department.valueOf(rs.getString("department")));
+                 admin.setSpecialization(Specialization.valueOf(rs.getString("specialization")));
+ 				
+ 				// Step 7: Get the password from the result set
+ 				String hashedPassword = rs.getString("password");
+ 				
+ 				// Step 8: Validate the password
+ 				boolean isPasswordCorrect = admin.verifyPassword(password, hashedPassword);
+ 				
+ 				// Step 9: If password matches return the university student object
+ 				if(isPasswordCorrect) {
+ 					// Set login status related fields
+ 					admin.setLoggedIn(true);
+ 					admin.setUpdatedAt(LocalDateTime.now());
+ 					
+ 					// Update the logged in field in the db
+ 					final String updateLoginStatus = "UPDATE admin SET isLoggedIn = ?, updated_at = ? WHERE Email = ? OR AdminId = ?";
+ 					
+ 					try(PreparedStatement updateStatus = conn.prepareStatement(updateLoginStatus)) {
+ 						
+ 						// Setting the palceholders with acutal values
+ 						updateStatus.setBoolean(1, admin.isLoggedIn());
+ 						updateStatus.setTimestamp(2, Timestamp.valueOf(admin.getUpdatedAt()));
+ 						updateStatus.setString(3, admin.getEmail());
+ 						updateStatus.setString(4, admin.getAdminId());
+ 						
+ 						// Execute the query
+ 						updateStatus.executeUpdate();
+ 						
+ 					}
+ 				    catch (SQLException e) {
+ 				    	throw new SQLException("Failed to update login status", e);
+ 			        }
+ 					
+ 					return admin;
+ 				}
+ 				else {
+ 	                throw new Exception("Incorrect password. Please try again!");
+ 				}	
+ 			}
+ 			else {
+                 throw new Exception("User doesn't exist with this email or id!");
+ 			}
+ 			
+ 		} catch (SQLException e) {
+ 			throw new SQLException("Failed to connect to the database!", e);
+ 		}
+ 	}
+
+    
+    // New Method: Update refresh token in the database
+    public void updateRefreshToken(Admin admin) throws SQLException, ClassNotFoundException {
+        final String UPDATE_REFRESH_TOKEN = "UPDATE admin SET refreshToken = ? WHERE adminId = ?";
 
         try (Connection conn = DbConnect.getConnnection();
-             PreparedStatement st = conn.prepareStatement(FIND_ADMIN)) {
+             PreparedStatement st = conn.prepareStatement(UPDATE_REFRESH_TOKEN)) {
 
-            st.setString(1, adminId);
-            st.setString(2, email);
-
-            ResultSet rs = st.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            throw new SQLException("Failed to check admin existence.", e);
+            st.setString(1, admin.getRefreshToken());
+            st.setString(2, admin.getAdminId());
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Failed to update refresh token for admin.");
+            }
         }
     }
+    
 
-    // Login admin
-    public Admin loginAdmin(String adminIdOrEmail, String password) throws SQLException, ClassNotFoundException {
-        final String LOGIN_ADMIN = "SELECT * FROM admins WHERE (adminId = ? OR email = ?) AND password = ?";
+    // Check if Admin already present or registered
+ 	public boolean findByEmailOrId (String emailOrId) throws SQLException, ClassNotFoundException {
+ 		
+ 		// Step 1: Prepare the query
+ 		final String FIND_ADMIN = "SELECT COUNT(*) FROM admin WHERE email = ? OR adminId = ?";
+ 		
+ 		// Step 2: Establish the connection
+ 		try(Connection conn = DbConnect.getConnnection();
+ 				PreparedStatement st = conn.prepareStatement(FIND_ADMIN)) {
+ 			
+ 			// Step 3: Setting the placeholder with actual values
+ 			st.setString(1, emailOrId);
+ 			st.setString(2, emailOrId);
+ 			
+ 			// Step 4: Execute the query and store the result into result set
+ 			ResultSet rs = st.executeQuery();
+ 			
+ 			// Step 5: Checking if multiple user exist or not
+ 			if(rs.next()) {
+ 				return rs.getInt(1) > 0;
+ 			}
+ 		} catch (SQLException e) {
+ 			throw new SQLException("Failed to connect to the database!", e.getMessage());
+ 		}
+ 		return false;
+ 	}
+ 	
+
+    // Retrieve an Admin object by admin ID
+    public Admin getByEmailOrId(String emailOrId) throws Exception {
+        final String GET_ADMIN = "SELECT * FROM admin WHERE email = ? OR adminId = ?";
 
         try (Connection conn = DbConnect.getConnnection();
-             PreparedStatement st = conn.prepareStatement(LOGIN_ADMIN)) {
+             PreparedStatement st = conn.prepareStatement(GET_ADMIN)) {
 
-            st.setString(1, adminIdOrEmail);
-            st.setString(2, adminIdOrEmail);
-
-            st.setString(3, hashPassword(password));
+            st.setString(1, emailOrId);
+            st.setString(2, emailOrId);
 
             ResultSet rs = st.executeQuery();
+
             if (rs.next()) {
+            	
                 Admin admin = new Admin();
                 admin.setRole(Role.valueOf(rs.getString("role")));
                 admin.setAdminId(rs.getString("adminId"));
-                admin.setAdminLabel(rs.getString("adminLabel"));
+                admin.setAdminLevel(rs.getString("adminLevel"));
                 admin.setFullname(rs.getString("fullname"));
                 admin.setEmail(rs.getString("email"));
                 admin.setUniversityName(rs.getString("universityName"));
                 admin.setDepartment(Department.valueOf(rs.getString("department")));
                 admin.setSpecialization(Specialization.valueOf(rs.getString("specialization")));
-                admin.setPermissions(List.of(rs.getString("permissions").split(",")));
+                admin.setRefreshToken(rs.getString("refreshToken"));
+                
                 return admin;
             }
+            else {
+                throw new Exception("Admin doesn't exist with this email or id!");
+            }
         } catch (SQLException e) {
-            throw new SQLException("Failed to login admin.", e);
+            System.err.println("Error retrieving admin by ID: " + e.getMessage());
+            throw new SQLException("Failed to retrieve admin by ID.", e);
         }
-        return null;
     }
 }

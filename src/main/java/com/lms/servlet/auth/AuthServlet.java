@@ -8,9 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+import com.lms.dao.AdminDao;
 import com.lms.dao.FacultyDao;
 import com.lms.dao.IndividualStudentDao;
 import com.lms.dao.UniversityStudentDao;
+import com.lms.models.Admin;
 import com.lms.models.Faculty;
 import com.lms.models.IndividualStudent;
 import com.lms.models.UniversityStudent;
@@ -30,12 +32,14 @@ public class AuthServlet extends HttpServlet {
 	private IndividualStudentDao individualStudentDao;
 	private UniversityStudentDao universityStudentDao;
 	private FacultyDao facultyDao;
+	private AdminDao adminDao;
 	
     public AuthServlet() {
         super();
         this.universityStudentDao = new UniversityStudentDao();
         this.individualStudentDao = new IndividualStudentDao();
         this.facultyDao = new FacultyDao();
+        this.adminDao = new AdminDao();
     }
 
 	
@@ -196,7 +200,51 @@ public class AuthServlet extends HttpServlet {
 				else {
                     throw new ApiError(401, "Invalid email or faculty ID, or password!");
                 }
-			}			
+			}
+			
+            else if(role.equals("ADMIN")) {
+				
+				// Login the user and create the user object
+				Admin admin = adminDao.loginAdmin(credential, password);
+				
+				// Check if user is successfully logged in or not
+				boolean isUserLoggedIn = admin.isLoggedIn();
+				
+				if(isUserLoggedIn) {
+                    res.getWriter().write("Admin logged in successfully!");
+                    
+                    // If Admin logged in successfully then generate the access token
+                    String accessToken = jwt.generateAdminAccessToken(
+                    		admin.getRole().toString(),
+                    		admin.getAdminId(),
+                    		admin.getAdminLevel(),
+                    		admin.getEmail()
+                    		
+                    );
+                    
+                    // Generate refresh token
+                    String refreshToken = jwt.generateRefreshToken(admin.getEmail());
+                    
+                    // Set the refresh token in the Admin object
+                    admin.setRefreshToken(refreshToken);
+                    
+                    // Optionally, update the admint in the database here
+                    adminDao.updateRefreshToken(admin);
+                    
+                    // Send tokens back to client
+                    res.getWriter().write("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
+       
+				}
+				else {
+                    throw new ApiError(401, "Invalid email or ID, or password!");
+                }
+				
+			}
+			
+			else {
+				throw new ApiError(400, "User role not found!");
+			}
+			
 			
 		} catch (ApiError e) {
 			res.setStatus(e.getStatusCode());
