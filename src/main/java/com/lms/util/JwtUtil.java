@@ -42,22 +42,22 @@ public class JwtUtil {
 	}
 	
 	// Create faculty jwt token
-	public String generateFacultyAccessToken(String id, String role, String facultyId, String department, String[] permissions) {
-		// additional claims like specialization
-		Date currentTime = new Date(System.currentTimeMillis());
-		Date expTime = new Date(System.currentTimeMillis() + 3600000);
-		
-		return Jwts.builder()
-				.setSubject(id)
-				.claim("role", role)
-				.claim("facultyId", facultyId)
-				.claim("department", department)
-				.claim("permissions", permissions)
-				.setIssuedAt(currentTime)
-				.setExpiration(expTime)
-				.signWith(secret, SignatureAlgorithm.HS256)
-				.compact();
-	}
+		public String generateFacultyAccessToken(String email, String role, String facultyId, String department) {
+			Date currentTime = new Date(System.currentTimeMillis());
+			Date expTime = new Date(System.currentTimeMillis() + 3600000);
+			
+			return Jwts.builder()
+					.setSubject(email)
+					.claim("role", role)
+					.claim("facultyId", facultyId)
+					.claim("department", department)
+//					.claim("permissions", permissions)
+					.setIssuedAt(currentTime)
+					.setExpiration(expTime)
+					.signWith(secret, SignatureAlgorithm.HS256)
+					.compact();
+		}
+
 	
 	// Create admin jwt token
 	public String generateAdminAccessToken(String id, String role, String adminId, String adminLevel, String[] permissions) {

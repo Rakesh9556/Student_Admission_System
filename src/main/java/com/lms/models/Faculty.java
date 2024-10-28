@@ -1,6 +1,6 @@
 package com.lms.models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.lms.models.constants.Department;
@@ -9,7 +9,7 @@ import com.lms.models.constants.Specialization;
 
 public class Faculty extends User {
 	 private String facultyId;
-	 private LocalDate joiningDate;
+	 private LocalDateTime joiningDate;
 	 private List<String> permissions;
 	 
 	 
@@ -19,13 +19,11 @@ public class Faculty extends User {
 	
 	// Constructor 
 	public Faculty(Role role, String fullname, String email, String password, String universityName,Department department,
-	Specialization specialization, String facultyId, LocalDate joiningDate, List<String> permissions)
-	{
+	Specialization specialization, String facultyId) {
 		        super(role, fullname, email, password, universityName, department, specialization);
 		        this.setFacultyId(facultyId);
-		        this.setJoiningDate(joiningDate);
-		        this.setPermissions(permissions);
-		    }
+	}
+	
 	//Getters and Setters
 	public String getFacultyId() {
 	    return facultyId;
@@ -38,11 +36,11 @@ public class Faculty extends User {
 	    this.facultyId = facultyId;
 	}
 	
-	public LocalDate getJoiningDate() {
+	public LocalDateTime getJoiningDate() {
 	    return joiningDate;
 	}
 	
-	public void setJoiningDate(LocalDate joiningDate) {
+	public void setJoiningDate(LocalDateTime joiningDate) {
 	    if(joiningDate == null) {
 	        throw new IllegalArgumentException("Joining date cannot be empty");
 	    }

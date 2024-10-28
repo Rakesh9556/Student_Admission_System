@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+import com.lms.dao.FacultyDao;
 import com.lms.dao.IndividualStudentDao;
 import com.lms.dao.UniversityStudentDao;
+import com.lms.models.Faculty;
 import com.lms.models.IndividualStudent;
 import com.lms.models.UniversityStudent;
 import com.lms.util.ApiError;
@@ -27,11 +29,13 @@ public class AuthServlet extends HttpServlet {
 	// Step 2: Create instance of the user dao class to access dao methods
 	private IndividualStudentDao individualStudentDao;
 	private UniversityStudentDao universityStudentDao;
+	private FacultyDao facultyDao;
 	
     public AuthServlet() {
         super();
         this.universityStudentDao = new UniversityStudentDao();
         this.individualStudentDao = new IndividualStudentDao();
+        this.facultyDao = new FacultyDao();
     }
 
 	
@@ -157,11 +161,42 @@ public class AuthServlet extends HttpServlet {
 	                }
 				}
 			}
-			
-//			else if(role.equals("FACULTY")) {
-//				// Login the user and create the user object				
-//			}
-			
+            
+			else if(role.equals("FACULTY")) {
+				
+				// Login the user and create the user object	
+				Faculty faculty = facultyDao.loginFaculty(credential, password);
+				
+				// Check if user is successfully logged in or not
+				boolean isUserLoggedIn = faculty.isLoggedIn();
+				
+				if(isUserLoggedIn) {
+                    res.getWriter().write("Faculty logged in successfully!");
+                    
+                    // If user logged in successfully then generate the access token
+                    String accessToken = jwt.generateFacultyAccessToken(
+                    		faculty.getEmail(),
+                    		faculty.getRole().toString(),
+                    		faculty.getFacultyId(),
+                    		faculty.getDepartment().toString()		
+                    );
+                    
+                    // Generate refresh token
+                    String refreshToken = jwt.generateRefreshToken(faculty.getEmail());
+                    
+                    // Set the refresh token in the Faculty object
+                    faculty.setRefreshToken(refreshToken);
+                    
+                    // Optionally, update the faculty in the database here
+                    facultyDao.updateRefreshToken(faculty);
+                    
+                    // Send tokens back to client
+                    res.getWriter().write("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
+				}
+				else {
+                    throw new ApiError(401, "Invalid email or faculty ID, or password!");
+                }
+			}			
 			
 		} catch (ApiError e) {
 			res.setStatus(e.getStatusCode());

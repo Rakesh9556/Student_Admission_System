@@ -120,6 +120,31 @@ public class RefreshTokenServlet extends HttpServlet {
 				// Step 9: Return the new access token in response
 	            res.getWriter().write("New Access Token: " + newAccessToken);
 			}
+			 else if(isFacultyExist) {
+					
+					// Retrieve the the individual student object
+					Faculty faculty = facultyDao.getByfacultyIdOrEmail(userId);
+					System.out.println("Stored token: " + faculty.getRefreshToken());
+
+					// Check if refresh token matches to the stored ones in database
+					if(!refreshToken.equals(faculty.getRefreshToken())) {
+						 System.out.println("Invalid token check: Received token: " + refreshToken);
+						
+						throw new ApiError(401, "Invalid refresh token!");
+					}
+					
+					// If token matches generate a new access token
+					newAccessToken = jwt.generateFacultyAccessToken(
+	                		faculty.getEmail(),
+	                		faculty.getRole().toString(),
+	                		faculty.getFacultyId(),
+	                		faculty.getDepartment().toString()
+	                );
+					
+					// Step 9: Return the new access token in response
+		            res.getWriter().write("New Access Token: " + newAccessToken);
+	            }
+
 			else {
 				throw new ApiError(404, "User not found");
 			}

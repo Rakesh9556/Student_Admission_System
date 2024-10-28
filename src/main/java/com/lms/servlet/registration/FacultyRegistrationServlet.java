@@ -7,10 +7,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 import com.lms.dao.FacultyDao;
 import com.lms.models.Faculty;
@@ -18,9 +14,8 @@ import com.lms.models.constants.Department;
 import com.lms.models.constants.Role;
 import com.lms.models.constants.Specialization;
 import com.lms.util.ApiError;
-import com.lms.util.DuplicateEntryException;
 
-@WebServlet("/facultyRegister")
+@WebServlet("/faculty/register")
 public class FacultyRegistrationServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -62,9 +57,7 @@ public class FacultyRegistrationServlet extends HttpServlet {
                  String universityName = req.getParameter("universityName"); // University name
                  String department = req.getParameter("department");       // Department
                  String specialization = req.getParameter("specialization"); // Specialization
-                 String joiningDate = req.getParameter("joiningDate");     // Joining date
-                 String permissionsStr = req.getParameter("permissions");  // Permissions (comma-separated)
-
+                 
                  // Step 3: Validate all the fields
                  if (facultyId == null || facultyId.trim().isEmpty()) {
                      throw new ApiError(400, "Faculty ID is required!");
@@ -90,24 +83,13 @@ public class FacultyRegistrationServlet extends HttpServlet {
                  if (specialization == null) {
                      throw new ApiError(400, "Specialization is required!");
                  }
-                 if (joiningDate == null || joiningDate.trim().isEmpty()) {
-                     throw new ApiError(400, "Joining date is required!");
-                 }
-                 if (permissionsStr == null || permissionsStr.trim().isEmpty()) {
-                     throw new ApiError(400, "Permissions are required!");
-                 }
+                 
 
-                // Convert joiningDate to LocalDate
-                LocalDate joiningDateParsed = LocalDate.parse(joiningDate);
-
-                // Step 4: Validate enum fields and parse permissions
+                // Step 4: Validate enum fields
                 try {
                     Role roleEnum = Role.valueOf(role);
                     Department departmentEnum = Department.valueOf(department.toUpperCase());
                     Specialization specializationEnum = Specialization.valueOf(specialization.toUpperCase());
-
-                    // Parse permissions from comma-separated string
-                    List<String> permissions = Arrays.asList(permissionsStr.split(","));
 
                     // Step 5: Create the Faculty object
                     Faculty faculty = new Faculty();
@@ -119,21 +101,12 @@ public class FacultyRegistrationServlet extends HttpServlet {
                     faculty.setUniversityName(universityName);                 // Set University Name
                     faculty.setDepartment(departmentEnum);                     // Set Department
                     faculty.setSpecialization(specializationEnum);             // Set Specialization
-                    faculty.setJoiningDate(joiningDateParsed);                 // Set Joining Date
-                    faculty.setPermissions(permissions);  
-                    //Faculty faculty = new Faculty(roleEnum, firstname + " " + lastname, email, password, universityName,
-                    //    departmentEnum, specializationEnum, facultyId, joiningDateParsed, permissions);
-
-                    // Step 6: Check if user already exists with email or faculty ID
-                    boolean isExist = facultyDao.findFaculty(faculty.getEmail(), faculty.getFacultyId());
-                    if (isExist) {
-                        throw new DuplicateEntryException("User already exists with this email or faculty ID!", null);
-                    }
-
-                    // Step 7: Register the faculty
+                      
+                    
+                    // Step 6: Register the faculty
                     boolean isRegistered = facultyDao.registerFaculty(faculty);
 
-                    // Step 8: Check if faculty is successfully registered
+                    // Step 7: Check if faculty is successfully registered
                     if (isRegistered) {
                         res.getWriter().write("Faculty registered successfully!");
                     } else {
