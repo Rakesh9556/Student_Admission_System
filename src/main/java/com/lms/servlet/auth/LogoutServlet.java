@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.lms.dao.AdminDao;
 import com.lms.dao.FacultyDao;
 import com.lms.dao.IndividualStudentDao;
 import com.lms.dao.UniversityStudentDao;
@@ -24,6 +25,7 @@ public class LogoutServlet extends HttpServlet {
 	IndividualStudentDao individualStudentDao = new IndividualStudentDao();
     UniversityStudentDao universityStudentDao = new UniversityStudentDao();
     FacultyDao facultyDao = new FacultyDao();
+    AdminDao adminDao = new AdminDao();
 		
     public LogoutServlet() {
         super();
@@ -70,6 +72,15 @@ public class LogoutServlet extends HttpServlet {
 					facultyDao.logout(userId);
 				}else {
 					throw new ApiError(404, "Faculty not found");
+				}
+			}
+			else if(role.equals("ADMIN")){
+				if(adminDao.findByEmailOrId(userId)) {
+					adminDao.logout(userId);
+				}else if(adminDao.findByEmailOrId(userId)) {
+					adminDao.logout(userId);
+				}else {
+					throw new ApiError(404, "Admin not found");
 				}
 			}
 			

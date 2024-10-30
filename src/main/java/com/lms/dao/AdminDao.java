@@ -237,4 +237,34 @@ public class AdminDao {
             throw new SQLException("Failed to retrieve admin by ID.", e);
         }
     }
+    
+    // logout the Admin
+ 	public void logout(String emailOrId) throws SQLException, ClassNotFoundException {
+ 		
+ 		// Step 1: Preapare the query
+ 		String ADMIN = "UPDATE admin SET refreshToken = NULL, isLoggedIn = FALSE WHERE email = ? OR adminId = ?";
+ 		
+ 		// Step 2: Establish the connection
+ 		try(Connection conn = DbConnect.getConnnection();
+ 				PreparedStatement st = conn.prepareStatement(ADMIN)) {
+ 			
+ 			// Step 3: Setting up the placeholders with actual values
+ 			st.setString(1, emailOrId);
+ 			st.setString(2, emailOrId);
+ 			
+ 			// Step 4: Execute the prepared statement
+ 			int rowsAffected = st.executeUpdate();
+ 			// Step 5: Validate if database operation performed or not
+ 			if (rowsAffected > 0) {
+                 System.out.println("Admin logout successfully.");
+             } else {
+                 System.out.println("User not found with this Admin id or email.");
+             }
+ 				
+ 		} catch (SQLException e) {
+ 			System.err.println("SQL State: " + e.getSQLState());
+ 	        System.err.println("Error Code: " + e.getErrorCode());
+ 			throw new SQLException("Failed to logout by Admin!", e);
+ 		}
+ 	}
 }
