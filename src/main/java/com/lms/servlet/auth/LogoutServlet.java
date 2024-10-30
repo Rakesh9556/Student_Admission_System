@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.lms.dao.FacultyDao;
 import com.lms.dao.IndividualStudentDao;
 import com.lms.dao.UniversityStudentDao;
 import com.lms.util.ApiError;
@@ -22,6 +23,7 @@ public class LogoutServlet extends HttpServlet {
 	JwtUtil jwt = new JwtUtil();
 	IndividualStudentDao individualStudentDao = new IndividualStudentDao();
     UniversityStudentDao universityStudentDao = new UniversityStudentDao();
+    FacultyDao facultyDao = new FacultyDao();
 		
     public LogoutServlet() {
         super();
@@ -58,9 +60,19 @@ public class LogoutServlet extends HttpServlet {
 	            } else if (universityStudentDao.findUser(userId)) {
 	                universityStudentDao.logout(userId);
 	            } else {
-	                throw new ApiError(404, "User not found");
+	                throw new ApiError(404, "Student not found");
 	            }
 			}
+			else if(role.equals("FACULTY")){
+				if(facultyDao.findByEmailOrId(userId)) {
+					facultyDao.logout(userId);
+				}else if(facultyDao.findByEmailOrId(userId)) {
+					facultyDao.logout(userId);
+				}else {
+					throw new ApiError(404, "Faculty not found");
+				}
+			}
+			
 			
 			res.setStatus(HttpServletResponse.SC_OK);
             res.getWriter().write("Logout successful");

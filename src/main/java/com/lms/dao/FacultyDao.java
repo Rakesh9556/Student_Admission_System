@@ -77,7 +77,7 @@ public class FacultyDao {
  	public boolean findByEmailOrId (String emailOrId) throws SQLException, ClassNotFoundException {
  		
  		// Step 1: Prepare the query
- 		final String findFaculty = "SELECT COUNT(*) FROM faculty WHERE email = ? OR facultyId = ?";
+ 		final String findFaculty = "SELECT COUNT(*) FROM faculty WHERE facultyId = ? OR email = ?";
  		
  		// Step 2: Establish the connection
  		try(Connection conn = DbConnect.getConnnection();
@@ -258,5 +258,36 @@ public class FacultyDao {
 			throw new SQLException("Failed to update refresh token!");
 		}
 	}
+	
+	// logout the student
+	public void logout(String emailOrId) throws SQLException, ClassNotFoundException {
+		
+		// Step 1: Preapare the query
+		String faculty = "UPDATE faculty SET refreshToken = NULL, isLoggedIn = FALSE WHERE email = ? OR facultyId = ?";
+		
+		// Step 2: Establish the connection
+		try(Connection conn = DbConnect.getConnnection();
+				PreparedStatement st = conn.prepareStatement(faculty)) {
+			
+			// Step 3: Setting up the placeholders with actual values
+			st.setString(1, emailOrId);
+			st.setString(2, emailOrId);
+			
+			// Step 4: Execute the prepared statement
+			int rowsAffected = st.executeUpdate();
+			// Step 5: Validate if database operation performed or not
+			if (rowsAffected > 0) {
+                System.out.println("faculty logout successfully.");
+            } else {
+                System.out.println("User not found with this faculty id or email.");
+            }
+				
+		} catch (SQLException e) {
+			System.err.println("SQL State: " + e.getSQLState());
+	        System.err.println("Error Code: " + e.getErrorCode());
+			throw new SQLException("Failed to logout faculty!", e);
+		}
+	}
+	
 
 }
