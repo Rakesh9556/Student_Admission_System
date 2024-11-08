@@ -26,14 +26,13 @@ public class JwtUtil {
 
 	
 	// Create Student jwt token
-	public String generateStudentAccessToken(String id, String role, String studentType, Map<String, Object> additionalClaims) {
+	public String generateStudentAccessToken(String id, String role, Map<String, Object> additionalClaims) {
 		Date currentTime = new Date(System.currentTimeMillis());
 		Date expTime = new Date(System.currentTimeMillis() + 3600000);
 		
 		return Jwts.builder()
 				.setSubject(id)
 				.claim("role", role)
-				.claim("studentType", studentType)
 				.addClaims(additionalClaims)
 				.setIssuedAt(currentTime)
 				.setExpiration(expTime)
