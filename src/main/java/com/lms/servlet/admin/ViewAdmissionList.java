@@ -9,38 +9,38 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import com.lms.dao.ApplicationDao;
-import com.lms.models.Application;
+import com.lms.dao.AdmissionDao;
+import com.lms.models.Admission;
 import com.lms.util.ApiError;
 
-@WebServlet("/admin/view/applications")
-public class ViewApplicationsServlet extends HttpServlet {
+
+@WebServlet("/admin/view/admissions")
+public class ViewAdmissionList extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-	// Step 1: Create instance of application dao class to access its method
-	ApplicationDao applicationDao;
 	
-    public ViewApplicationsServlet() {
+	// Step 1: Create instance of application dao class to access its method
+	AdmissionDao admissionDao;
+	
+    public ViewAdmissionList() {
         super();
-        this.applicationDao = new ApplicationDao();
+        this.admissionDao = new AdmissionDao();
     }
 
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		
 		try {
 			
-			// Step 2: Retrive all the applications and store it in a list
-			List<Application> applications = applicationDao.getAllApplications();
+			// Step 2; Retrive all admission forms and store it in a list
+			List<Admission> admissions = admissionDao.getAllAdmissions();
 			
-			// Step 3: Passs the the application list onto the request to make available for next components
-			req.setAttribute("applications", applications);
+			// Step 3: Pass the admission list onto the request
+			req.setAttribute("admissions", admissions);
 			
-			// Step 4: Create request dispatcher obj to forward the req to specific view page
+			// Step 4: Create a request dispatcher to forward the request
 			RequestDispatcher dispatcher = req.getRequestDispatcher("/pages/dashboard/admin-dashboard.jsp");
 			
 			// Step 5: Forward the request
-			dispatcher.forward(req, res);
+			dispatcher .forward(req, res);
 			
 		} catch (ApiError e) {
 			res.setStatus(e.getStatusCode());

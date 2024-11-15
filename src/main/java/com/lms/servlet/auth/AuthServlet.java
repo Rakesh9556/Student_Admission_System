@@ -10,12 +10,10 @@ import java.util.Map;
 
 import com.lms.dao.AdminDao;
 import com.lms.dao.FacultyDao;
-import com.lms.dao.IndividualStudentDao;
-import com.lms.dao.UniversityStudentDao;
+import com.lms.dao.StudentDao;
 import com.lms.models.Admin;
 import com.lms.models.Faculty;
-import com.lms.models.IndividualStudent;
-import com.lms.models.UniversityStudent;
+import com.lms.models.Student;
 import com.lms.util.ApiError;
 import com.lms.util.JwtUtil;
 
@@ -29,15 +27,13 @@ public class AuthServlet extends HttpServlet {
 	JwtUtil jwt = new JwtUtil();
 	
 	// Step 2: Create instance of the user dao class to access dao methods
-	private IndividualStudentDao individualStudentDao;
-	private UniversityStudentDao universityStudentDao;
+	private StudentDao studentDao;
 	private FacultyDao facultyDao;
 	private AdminDao adminDao;
 	
     public AuthServlet() {
         super();
-        this.universityStudentDao = new UniversityStudentDao();
-        this.individualStudentDao = new IndividualStudentDao();
+        this.studentDao = new StudentDao();
         this.facultyDao = new FacultyDao();
         this.adminDao = new AdminDao();
     }
@@ -72,98 +68,45 @@ public class AuthServlet extends HttpServlet {
 			// Step 4: Handle different type of user
 			if(role.equals("STUDENT")) {
 				
-				// Step 5: Define which type of student
-				String studentType = req.getParameter("studentType").toUpperCase();
+				// Step 7: Login the user and create the user object
+				Student student = studentDao.loginUser(credential, password);
 				
-				if(studentType == null || studentType.trim().isEmpty()) {
-					throw new ApiError(400, "Student type is required");
-				}
+				// Step 8: Check if user is successfully logged in or not
+				boolean isUserLoggedIn = student.isLoggedIn();
 				
-				// Step 6: Handle login based on the student type (UNIVERSITY or INDIVIDUAL)
-				if(studentType.equals("UNIVERSITY")) {
-					
-					// Step 7: Login the user and create the user object
-					UniversityStudent universityStudent = universityStudentDao.loginUser(credential, password);
-					
-					// Step 8: Check if user is successfully logged in or not
-					boolean isUserLoggedIn = universityStudent.isLoggedIn();
-					
-					if(isUserLoggedIn) {
-	                    res.getWriter().write("University student logged in successfully!");
-	                    
-	                    //  Step 9: If user logged in successfully then generate the access token
-	                    String accessToken = jwt.generateStudentAccessToken(
-	                    		universityStudent.getStudentId(),
-	                    		universityStudent.getRole().toString(),
-	                    		universityStudent.getStudentType().toString(),
-	                    		Map.of("university name" , universityStudent.getUniversityName(),
-	                    				"university email", universityStudent.getEmail(),
-	                    			    "department", universityStudent.getDepartment().toString(),
-	                    			    "specialization", universityStudent.getSpecialization().toString())
-	                    );
-	                    
-	                    // Step 10: Generate the refresh token
-	                    String refreshToken = jwt.generateRefreshToken(universityStudent.getStudentId());
-	                    
-	                    // Step 11: Set the refresh token in the UniversityStudent object
-	                    universityStudent.setRefreshToken(refreshToken);
-	                    
-	                    // Step 12: Update the student in the database here
-	                    universityStudentDao.updateRefreshToken(universityStudent);
-	                    
-	                    // Debugging
-	                    // System.out.println("Access token: " + accessToken);
-	                    // System.out.println("Refresh token: " + refreshToken);
-	                    
-	                    // Send tokens back to client
-	                    res.getWriter().write("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
-	                
-					}
-					else {
-	                    throw new ApiError(401, "Invalid university email or student ID, or password!");
-	                }	
+				if(isUserLoggedIn) {
+                    res.getWriter().write("University student logged in successfully!");
+                    
+                    //  Step 9: If user logged in successfully then generate the access token
+                    String accessToken = jwt.generateStudentAccessToken(
+                    		student.getStudentId(),
+                    		student.getRole().toString(),
+                    		Map.of("universityName" , student.getUniversityName(),
+                    				"universityEmail", student.getEmail(),
+                    			    "department", student.getDepartment().toString(),
+                    			    "specialization", student.getSpecialization().toString())
+                    );
+                    
+                    // Step 10: Generate the refresh token
+                    String refreshToken = jwt.generateRefreshToken(student.getStudentId());
+                    
+                    // Step 11: Set the refresh token in the UniversityStudent object
+                    student.setRefreshToken(refreshToken);
+                    
+                    // Step 12: Update the student in the database here
+                    studentDao.updateRefreshToken(student);
+                    
+                    // Debugging
+                    // System.out.println("Access token: " + accessToken);
+                    // System.out.println("Refresh token: " + refreshToken);
+                    
+                    // Send tokens back to client
+                    res.getWriter().write("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
+                
 				}
-				
-				else if(studentType.equals("INDIVIDUAL")) {
-					
-					// Login the user and create the user object
-					IndividualStudent individualStudent = individualStudentDao.loginUser(credential, password);
-					
-					// Check if user is successfully logged in or not
-					boolean isUserLoggedIn = individualStudent.isLoggedIn();
-					
-					if(isUserLoggedIn) {
-	                    res.getWriter().write("Individual student logged in successfully!");
-	                    
-	                    // If user logged in successfully then generate the access token
-	                    String accessToken = jwt.generateStudentAccessToken(
-	                    		individualStudent.getEmail(),
-	                    		individualStudent.getRole().toString(),
-	                    		individualStudent.getStudentType().toString(),
-	                    		Map.of("username", individualStudent.getUsername(),
-	                    				"universityName", individualStudent.getUniversityName(),
-	                    				"department", individualStudent.getDepartment().toString(),
-	                    				"specialization", individualStudent.getSpecialization().toString())		
-	                    );
-	                    
-	                    // Generate refresh token
-	                    String refreshToken = jwt.generateRefreshToken(individualStudent.getEmail());
-	                    
-	                    // Set the refresh token in the UniversityStudent object
-	                    individualStudent.setRefreshToken(refreshToken);
-	                    
-	                    // Optionally, update the student in the database here
-	                    individualStudentDao.updateRefreshToken(individualStudent);
-	                    
-	                    // Send tokens back to client
-	                    res.getWriter().write("Access Token: " + accessToken + ", Refresh Token: " + refreshToken);
-	                
-
-					}
-					else {
-	                    throw new ApiError(401, "Invalid university email or student ID, or password!");
-	                }
-				}
+				else {
+                    throw new ApiError(401, "Invalid university email or student ID, or password!");
+                }	
 			}
             
 			else if(role.equals("FACULTY")) {

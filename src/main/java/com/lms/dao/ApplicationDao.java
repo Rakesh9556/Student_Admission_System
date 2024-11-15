@@ -54,10 +54,10 @@ public class ApplicationDao {
 				throw new SQLException("Failed to insert data!");
 			}
 			
-			// Step 7: If data successfull[y inserted return the applicationId
+			// Step 7: If data successfull[y inserted return 
 			return isInserted > 0;
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			throw new SQLException("Failed to connect to the database!", e);
 		}
 	}

@@ -1,4 +1,4 @@
-package com.lms.servlet.registration;
+package com.lms.servlet.admin;
 
 import com.lms.dao.AdminDao;
 import com.lms.models.Admin;

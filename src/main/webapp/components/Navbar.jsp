@@ -1,47 +1,58 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-
 <div class="flex flex-col items-center gap-y-12 w-36 h-screen mx-0 bg-green-600 drop-shadow-[4px_0_10px_rgba(0,0,0,0.4)]">
-    <a href="" class="mt-6">
-      <img src="/Learning_Management_System/resources/college.png" width="94" height="94" alt="Application img" />
+    <!-- College Logo -->
+    <a href="/" class="mt-6">
+        <img src="<%= request.getContextPath() %>/resources/images/college.png" width="94" height="94" alt="College logo">
     </a>
+    
     <ul class="grid gap-y-12">
-      <li class="flex flex-col items-center">
-          <a href="">
-              <img src="/Learning_Management_System/resources/application.svg" width="48" height="48" alt="Application img" />
+      <!-- Application -->
+      <li>
+          <a href="/application" class="flex flex-col items-center justify-center text-center">
+             <img src="/Learning_Management_System/resources/images/application.svg" width="48" height="48" alt="Application img" />
+             <span class="text-xl mt-3 font-bold">Application</span>
           </a>
-        <span class="text-xl mt-3 font-bold">Application</span>
       </li>
-      <li class="flex flex-col items-center">
-        <a href="">
-          <img src="/Learning_Management_System/resources/admission.svg" width="48" height="48" alt="Application img"/>
+      
+      <!-- Admission -->
+      <li>
+        <a href="/admission" class="flex flex-col items-center justify-center text-center">
+          <img src="<%= request.getContextPath() %>/resources/images/admission.svg" width="48" height="48" alt="Admission img"/>
+          <span class="text-xl mt-3 font-bold">Admission</span>
         </a>
-        <span class="text-xl mt-3 font-bold">Admission</span>
       </li>
-      <li class="flex flex-col items-center">
-        <a href="">
-          <img src="/Learning_Management_System/resources/course.svg" width="48" height="48" alt="Application img"/>
+      
+      <!-- Course -->
+      <li>
+        <a href="/course" class="flex flex-col items-center justify-center text-center">
+          <img src="<%= request.getContextPath() %>/resources/images/course.svg" width="48" height="48" alt="Course img"/>
+          <span class="text-xl mt-3 font-bold">Course</span>
         </a>
-        <span class="text-xl mt-3 font-bold">Course</span>
       </li>
-      <li class="flex flex-col items-center">
-        <a href="">
-          <img src="/Learning_Management_System/resources/student.svg" width="48" height="48" alt="Application img"/>
+      
+      <!-- Students -->
+      <li>
+        <a href="/students" class="flex flex-col items-center justify-center text-center">
+          <img src="<%= request.getContextPath() %>/resources/images/student.svg" width="48" height="48" alt="Students img"/>
+          <span class="text-xl mt-3 font-bold">Students</span>
         </a>
-        <span class="text-xl mt-3 font-bold">Students</span>
       </li>
-      <li class="flex flex-col items-center">
-        <a href="">
-          <img src="/Learning_Management_System/resources/faculty.svg" width="48" height="48" alt="Application img"/>
+      
+      <!-- Faculty -->
+      <li>
+        <a href="/faculty" class="flex flex-col items-center justify-center text-center">
+          <img src="<%= request.getContextPath() %>/resources/images/faculty.svg" width="48" height="48" alt="Faculty img"/>
+          <span class="text-xl mt-3 font-bold">Faculty</span>
         </a>
-        <span class="text-xl mt-3 font-bold">Faculty</span>
       </li>
-      <li class="flex flex-col items-center">
-        <a href="">
-          <img src="/Learning_Management_System/resources/administrator.svg" width="48" height="48" alt="Application img"/>
+      
+      <!-- Admin -->
+      <li>
+        <a href="/admin" class="flex flex-col items-center justify-center text-center">
+          <img src="<%= request.getContextPath() %>/resources/images/administrator.svg" width="48" height="48" alt="Admin img"/>
+          <span class="text-xl mt-3 font-bold">Admin</span>
         </a>
-        <span class="text-xl mt-3 font-bold">Admin</span>
       </li>
-
     </ul>
 </div>

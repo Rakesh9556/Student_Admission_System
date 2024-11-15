@@ -1,6 +1,7 @@
 package com.lms.models;
 import java.sql.Date;
 
+
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.lms.models.constants.ApplicationStatus;
@@ -24,7 +25,7 @@ public class Application {
 	private boolean isExamScheduled;
 	private PaymentStatus paymentStatus; 
 	
-	// Step 2: Design the constructors
+	// Step 2: Design the constructor
 	public Application() {
 		this.submissionDate = new Date(System.currentTimeMillis());
 		this.status = ApplicationStatus.PENDING;
@@ -47,13 +48,13 @@ public class Application {
 		this.paymentStatus = PaymentStatus.PENDING;
 	}
 	
-	// Step 3: Design the getters and setters
+	// Step 3: Design the getters and setters and add proper validations
 	public Long getApplicationId() {
 		return applicationId;
 	}
 	public void setApplicationId(Long applicationId) {
 		if(applicationId == null || applicationId <= 0) {
-			throw new IllegalArgumentException("Invalid application id!");
+			throw new IllegalArgumentException("Application id cannot be empty or negative!");
 		}
 		this.applicationId = applicationId;
 	}

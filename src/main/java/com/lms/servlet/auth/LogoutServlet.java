@@ -9,8 +9,7 @@ import java.io.IOException;
 
 import com.lms.dao.AdminDao;
 import com.lms.dao.FacultyDao;
-import com.lms.dao.IndividualStudentDao;
-import com.lms.dao.UniversityStudentDao;
+import com.lms.dao.StudentDao;
 import com.lms.util.ApiError;
 import com.lms.util.JwtUtil;
 
@@ -22,8 +21,7 @@ public class LogoutServlet extends HttpServlet {
        
 	// Step 1: Create an instance of JwtUtil class and student classes to access their properties
 	JwtUtil jwt = new JwtUtil();
-	IndividualStudentDao individualStudentDao = new IndividualStudentDao();
-    UniversityStudentDao universityStudentDao = new UniversityStudentDao();
+    StudentDao studentDao = new StudentDao();
     FacultyDao facultyDao = new FacultyDao();
     AdminDao adminDao = new AdminDao();
 		
@@ -57,29 +55,26 @@ public class LogoutServlet extends HttpServlet {
 			
 			// Step 5: Handle different type of user
 			if(role.equals("STUDENT")) {
-				if (individualStudentDao.findUser(userId)) {
-	                individualStudentDao.logout(userId);
-	            } else if (universityStudentDao.findUser(userId)) {
-	                universityStudentDao.logout(userId);
-	            } else {
+				if (studentDao.findByIdOrEmail(userId)) {
+	                studentDao.logout(userId);
+				}
+	            else {
 	                throw new ApiError(404, "Student not found");
 	            }
 			}
-			else if(role.equals("FACULTY")){
+			if(role.equals("FACULTY")){
 				if(facultyDao.findByEmailOrId(userId)) {
 					facultyDao.logout(userId);
-				}else if(facultyDao.findByEmailOrId(userId)) {
-					facultyDao.logout(userId);
-				}else {
+				}
+				else {
 					throw new ApiError(404, "Faculty not found");
 				}
 			}
 			else if(role.equals("ADMIN")){
 				if(adminDao.findByEmailOrId(userId)) {
 					adminDao.logout(userId);
-				}else if(adminDao.findByEmailOrId(userId)) {
-					adminDao.logout(userId);
-				}else {
+				}
+				else {
 					throw new ApiError(404, "Admin not found");
 				}
 			}

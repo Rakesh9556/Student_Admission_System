@@ -1,4 +1,4 @@
-package com.lms.servlet.registration;
+package com.lms.servlet.faculty;
 
 import jakarta.servlet.ServletException;
 

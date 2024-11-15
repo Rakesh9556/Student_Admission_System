@@ -1,14 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<div class="flex items-center justify-between px-8 w-full h-full py-3 bg-green-600 drop-shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
+<div class="flex items-center justify-between px-8 w-full h-fit py-3 bg-green-600 ">
     <h1 class="text-4xl font-bold">Dashboard</h1>
     <div class="flex items-center">
         <p class="text-xl font-bold mr-3">Profile</p>
         <div class="w-14 h-14 bg-blue-200 rounded-full mr-2 overflow-hidden relative">
             <button id="profileBtn">
-                <img src="img/user.svg" alt="Profile" class="w-full h-full object-fit p-1">
+          		<img src="<%= request.getContextPath() %>/resources/images/user.svg" width="48" height="48" alt="Profile logo"/>
             </button>
         </div>
     </div>
